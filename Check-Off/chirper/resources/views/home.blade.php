@@ -8,7 +8,7 @@
     <header class="w-full flex items-center justify-end">
         <a href="" class="inline-block">home</a> 
         <a href="" class="inline-block">contributions</a>
-        <a href="" class="inline-block">login</a>
+        <a href="/login" class="inline-block">login</a>
     </header>
     
     <div class="flex items-center w-full justify-center">
