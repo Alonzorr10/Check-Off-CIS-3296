@@ -2,7 +2,8 @@
     <!-- Session Status -->
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
-    <form method="POST" action="{{ route('login') }}">
+    {{-- <form method="POST" action="{{ route('login') }}"> --}}
+    <form id="firebase-login-form">
         @csrf
 
         <!-- Email Address -->
@@ -39,9 +40,62 @@
                 </a>
             @endif
 
-            <x-primary-button class="ms-3">
+            <x-primary-button class="ms-3" type="submit">
+            {{-- <x-primary-button class="ms-3"> --}}
                 {{ __('Log in') }}
             </x-primary-button>
         </div>
     </form>
+
+    {{-- changed from FB Doc --}}
+    <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-auth.js';
+
+    const firebaseConfig = {
+        apiKey: "{{ env('VITE_FIREBASE_API_KEY') }}",
+        authDomain: "{{ env('VITE_FIREBASE_AUTH_DOMAIN') }}",
+        projectId: "{{ env('VITE_FIREBASE_PROJECT_ID') }}",
+        storageBucket: "{{ env('VITE_FIREBASE_STORAGE_BUCKET') }}",
+        messagingSenderId: "{{ env('VITE_FIREBASE_MESSAGING_SENDER_ID') }}",
+        appId: "{{ env('VITE_FIREBASE_APP_ID') }}",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const form = document.getElementById('firebase-login-form');
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const csrf = document.querySelector('input[name="_token"]').value;
+
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            const token = await userCredential.user.getIdToken();
+
+            const response = await fetch('/firebase/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrf,
+                },
+                body: JSON.stringify({ token: token }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to Login!');
+            }
+
+            window.location.href = data.redirect || '/dashboard';
+        } catch (error) {
+            alert(error.message);
+        }
+    });
+    </script>
 </x-guest-layout>
