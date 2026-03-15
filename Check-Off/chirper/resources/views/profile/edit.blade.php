@@ -5,7 +5,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12 justify-center justify-items-center justify-self-center content-center items-center self-center place-content-center place-items-center place-self-center">
+    <div class="py-12 justify-center items-center">
         <div class="max-w-7xl  sm:px-6 lg:px-8 space-y-6">
             <div class="p-4 sm:p-8 bg-stone-200 dark:bg-stone-800 sm:rounded-lg">
                 <div class="max-w-xl">

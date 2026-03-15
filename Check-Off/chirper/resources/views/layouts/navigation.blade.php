@@ -23,7 +23,7 @@
 
                 </div>
             </div>
-            <div class='justify-center justify-items-center justify-self-center content-center items-center self-center place-content-center place-items-center place-self-center pr-5'><a href='/profile' class='nav-link inline-flex items-center justify-center w-9 h-9 rounded-full hover:ring-2 hover:ring-yellow-600 transition-all'>
+            <div class='justify-center items-center pr-5'><a href='/profile' class='nav-link inline-flex items-center justify-center w-9 h-9 rounded-full hover:ring-2 hover:ring-yellow-600 transition-all'>
                 {{strtoupper(substr(Auth::user()->name,0,1))}}</a></div>
             <!-- Settings Dropdown -->
              <!--
