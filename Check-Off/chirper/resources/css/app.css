@@ -1,4 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-body{font-family:'Chiron GoRound TC',sans-serif;}
+body {
+    font-family: "Chiron GoRound TC", sans-serif;
+}
+/* events.blade.php */
+#user-events {
+    font-size: 3rem;
+    font-weight: bolder;
+}
+
+button {
+    width: 200px;
+    height: 50px;
+    border-radius: 10px;
+}
+
+#create-event {
+    background-color: rgb(225, 178, 109);
+    font-family: inherit;
+    font-size: 20px;
+}
+
+#create-event:hover {
+    background-color: rgb(230, 199, 168);
+    font-family: inherit;
+    font-size: 20px;
+}

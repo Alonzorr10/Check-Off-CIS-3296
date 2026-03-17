@@ -1,15 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Events</title>
-    <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&display=swap" rel="stylesheet">
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-    <style>body {font-family: 'Chiron GoRound TC', sans-serif;}</style>
+@extends('layouts.logged')
+
+@section('content')
 </head>
 <body>
-    <button onclick="generateRandomButton(4)">Testing</button>
+    <div id="user-events">Your Events</div>
+
+    <div id="new-event">
+        <button id="create-event" class="create-event" onclick="addNewEventBlock()"> Create New Event</button>
+
+        <div id="event-container"class="space-y-4"></div>
+    </div>
+
+
+
+    
     <script src="{{ asset('storage/customjs/events.js') }}"></script>
 </body>
 </html>
+@endsection
