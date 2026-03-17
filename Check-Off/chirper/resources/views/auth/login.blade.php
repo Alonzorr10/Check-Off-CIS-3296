@@ -1,3 +1,6 @@
+@extends('layouts.web')
+
+@section('content')
 <x-guest-layout>
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
@@ -59,3 +62,4 @@
         });
     </script>
 </x-guest-layout>
+@endsection
