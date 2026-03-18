@@ -14,7 +14,7 @@
 
 
     
-    <script src="{{ asset('storage/customjs/events.js') }}"></script>
+    <script src="{{ asset('js/events.js') }}"></script>
 </body>
 </html>
 @endsection
