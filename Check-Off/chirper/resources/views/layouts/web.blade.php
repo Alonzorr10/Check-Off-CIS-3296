@@ -10,10 +10,21 @@
         <link href="https://fonts.googleapis.com/css2?family=Chiron+GoRound+TC:wght@200..900&display=swap" rel="stylesheet">
         <style>body {font-family: 'Chiron GoRound TC', sans-serif;}</style>
     </head>
-    <body class="min-h-screen flex flex-col">
+    <body class="flex flex-col w-full min-h-screen h-screen max-h-screen">
         @include('partials.navbar')
-        <main class="flex-1 flex flex-col justify-center items-center w-full">
+        <div class='flex-1 flex'>
             @yield('content')
-        </main>
+        </div>
+        <script>
+        document.addEventListener('DOMContentLoaded',()=>{
+            document.querySelectorAll('input[maxlength="1"]').forEach((input,idx,inputs)=>{
+                input.addEventListener('input',()=>{
+                    if (input.value.length===1&&idx<inputs.length-1){
+                        inputs[idx+1].focus()
+                    }
+                })
+            })
+        })
+        </script>
     </body>
 </html>
