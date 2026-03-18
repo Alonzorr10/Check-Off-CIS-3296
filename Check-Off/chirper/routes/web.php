@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 
-Route::get('/home', function () {
+Route::get('/', function () {
     if (Auth:: check()) {
         $events = Auth::user()->events;
         return view('events', compact('events'));

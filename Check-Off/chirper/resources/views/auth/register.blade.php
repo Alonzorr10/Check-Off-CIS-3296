@@ -143,3 +143,4 @@
         });
     </script>
 </x-guest-layout>
+@endsection
