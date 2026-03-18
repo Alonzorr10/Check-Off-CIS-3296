@@ -1,3 +1,6 @@
+@extends('layouts.web')
+
+@section('content')
 <x-guest-layout>
     <form id="firebase-register-form">
         @csrf
