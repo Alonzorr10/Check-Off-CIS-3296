@@ -1,9 +1,20 @@
 @tailwind base;
-@tailwind components;
-@tailwind utilities;
-body {
-    font-family: "Chiron GoRound TC", sans-serif;
+@layer base {
+    *{@apply outline outline-1 outline-blue-100 font-sans font-light md:font-normal antialiased text-center text-lg leading-tight;}
+    p{@apply text-left;}
+    a{@apply hover:md:font-semibold;}
+    form{@apply min-w-0 w-full max-w-sm;width:fit-content;}
+    input{@apply min-w-0 w-full border-0 ring-0 focus:ring-blue-300 focus:outline-none rounded;}
+    label{all:unset; @apply text-2xl;}
+    button{@apply hover:font-medium hover:ring-blue-300 hover:ring-1 outline-none ring-0 outline-0 border-0;}
+    div{@apply flex;}
 }
+@tailwind components;
+@layer components {
+    .active{@apply font-medium md:font-semibold;}
+}
+@tailwind utilities;
+
 /* events.blade.php */
 #user-events {
     font-size: 3rem;

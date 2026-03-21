@@ -1,54 +1,34 @@
 @extends('layouts.web')
 
 @section('content')
-<x-guest-layout>
-    <x-auth-session-status class="mb-4" :status="session('status')" />
-
-    <form id="firebase-email-login-form">
+<div class='flex flex-1 flex-col items-center justify-center gap-5'>
+    <x-auth-session-status :status="session('status')" />
+    <form id="firebase-email-login-form flex flex-col items-center justify-center gap-5">
         @csrf
-
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input
+        <div class='flex flex-col gap-5 items-center justify-center'>
+            <div><label for="email">email</label></div>
+            <div><input
                 id="email"
-                class="block mt-1 w-full"
+                class=""
                 type="email"
                 name="email"
                 required
                 autofocus
                 autocomplete="username"
-            />
-        </div>
-
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input
+            /></div>
+            <div><label for="password">password</label></div>
+            <div><input
                 id="password"
-                class="block mt-1 w-full"
                 type="password"
                 name="password"
                 required
                 autocomplete="current-password"
-            />
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            <a class="underline text-lg text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 dark:focus:ring-offset-stone-800" href="{{ route('register') }}">
-                {{ __('Need an account? Register') }}
-            </a>
-
-            <x-primary-button class="ms-3" type="submit">
-                {{ __('Log in with Email') }}
-            </x-primary-button>
+            /></div>
+            <div><button type="submit">log in with email</button></div>
         </div>
     </form>
-
-    <div class="flex items-center justify-center mt-6">
-        <x-primary-button id="google-login-btn" type="button">
-            {{ __('Sign in with Google') }}
-        </x-primary-button>
-    </div>
-
+    <div class='flex'><button id="google-login-btn" type="button">sign in with google</button></div>
+    <div class='flex'><a href="{{ route('register') }}">{{ __('Need an account? Register') }}</a></div>
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.2.1/firebase-app.js';
         import {
@@ -122,5 +102,5 @@
             }
         });
     </script>
-</x-guest-layout>
+</div>
 @endsection

@@ -11,23 +11,23 @@ Route::get('/', function () {
         return view('events', compact('events'));
     }
     return view('home');
-}); 
+})->name('home');
 
 Route::get('/contributions-logged-in', function () {
     return view('contributions-logged-in');
-});
+})->name('contributions-logged-in');
 
 Route::get('/contributions', function () {
     return view('contributions');
-});
+})->name('contributions');
 
 Route::get('/events', function () {
     return view('events');
-});
+})->name('events');
 
 Route::get('/profile', function () {
     return view('profile');
-});
+})->name('profile');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
