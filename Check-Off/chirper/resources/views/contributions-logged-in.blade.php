@@ -1,6 +1,8 @@
 @extends('layouts.logged')
 
 @section('content')
+
+
 </head>
 <body>
     <div class="page" id="page-contributions">

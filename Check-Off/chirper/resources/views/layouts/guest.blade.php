@@ -14,9 +14,9 @@
         <style>body {font-family: 'Chiron GoRound TC', sans-serif;}</style>
 
     </head>
-    <body class="bg-stone-50 text-stone-900 antialiased">
-        <div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 dark:bg-stone-900">
-            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-stone-200 dark:bg-stone-800 overflow-hidden sm:rounded-lg">
+    <body class="bg-stone-950 text-stone-900 antialiased">
+        <div class="min-h-screen flex flex-col justify-center items-center dark:bg-stone-500">
+            <div class="w-full sm:max-w-md mt-6 px-6 py-4 bg-stone-800 overflow-hidden sm:rounded-lg">
                 {{ $slot }}
             </div>
         </div>
