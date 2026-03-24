@@ -15,7 +15,7 @@
 
 
     
-    <script src="{{ asset('resources/js/events.js') }}"></script>
+    {{-- <script src="{{ asset('resources/js/events.js') }}"></script> --}}
 </body>
 </html>
 @endsection
