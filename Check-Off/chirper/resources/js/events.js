@@ -31,6 +31,55 @@ let currentUserId = null;
 let currentUserName = null;
 let currentUserEmail = null;
 let contributionUnsubscribes = [];
+window.toggleForm = (id) => {
+    const form = document.getElementById(`form-${id}`);
+    if (form) {
+        form.classList.toggle("hidden");
+    }
+};
+
+window.addNewEventBlock = function () {
+    const container = document.getElementById("event-container");
+    if (!container) return;
+
+    const tempId = Date.now();
+    const randomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+
+    const html = `
+        <div class="bg-stone-900 border-2 border-emerald-500 rounded-2xl p-6 mb-4 shadow-2xl" id="temp-${tempId}">
+            <input type="text" id="input-name-${tempId}" 
+                   class="w-full p-3 bg-stone-950 border-stone-700 rounded-xl text-white mb-4 outline-none focus:border-emerald-500" 
+                   placeholder="Enter Event Name (e.g. Birthday Dinner)">
+            <div class="flex gap-3">
+                <button type="button" onclick="confirmNewEvent('${tempId}', '${randomCode}')" 
+                        class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-sm font-bold transition">
+                    Save Event
+                </button>
+                <button type="button" onclick="document.getElementById('temp-${tempId}').remove()" 
+                        class="text-stone-400 text-sm hover:text-white transition">
+                    Cancel
+                </button>
+            </div>
+        </div>`;
+
+    container.insertAdjacentHTML("afterbegin", html);
+
+    setTimeout(
+        () => document.getElementById(`input-name-${tempId}`).focus(),
+        10,
+    );
+};
+
+window.deleteEvent = async (id) => {
+    if (confirm("Delete this event and all associated items permanently?")) {
+        try {
+            await deleteDoc(doc(db, "events", id));
+            // The onSnapshot listener will automatically remove the UI block
+        } catch (error) {
+            console.error("Error deleting event:", error);
+        }
+    }
+};
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUserId = user.uid;
@@ -198,6 +247,48 @@ window.saveContribution = async function (eventId, eventCode) {
         window.toggleForm(eventId);
     } catch (error) {
         console.error("Error adding contribution", error);
+    }
+};
+
+window.confirmNewEvent = async function (tempId, code) {
+    console.log("Attempting to save new event:", tempId);
+
+    const nameInput = document.getElementById(`input-name-${tempId}`);
+    if (!nameInput) {
+        console.error("Could not find input for tempId:", tempId);
+        return;
+    }
+
+    const name = nameInput.value.trim();
+    if (!name) {
+        alert("Please enter a name for your event.");
+        return;
+    }
+
+    if (!currentUserId) {
+        alert("Authentication error. Please refresh and log in again.");
+        return;
+    }
+
+    try {
+        // Save the event to the 'events' collection
+        const docRef = await addDoc(collection(db, "events"), {
+            name: name,
+            code: code,
+            creator_id: currentUserId,
+            creator_name: currentUserName,
+            creator_email: currentUserEmail,
+            created_at: serverTimestamp(),
+        });
+
+        console.log("Event saved successfully with ID:", docRef.id);
+
+        // Remove the temporary 'Draft' block from the UI
+        const tempBlock = document.getElementById(`temp-${tempId}`);
+        if (tempBlock) tempBlock.remove();
+    } catch (error) {
+        console.error("Error saving event to Firestore:", error);
+        alert("Failed to save event. Check your internet connection.");
     }
 };
 
