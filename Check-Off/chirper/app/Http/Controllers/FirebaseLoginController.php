@@ -20,7 +20,12 @@ class FirebaseLoginController extends Controller
         ]);
 
         try {
-            $verifiedIdToken = $this->firebaseAuth->verifyIdToken($request->token);
+            $verifiedIdToken = $this->firebaseAuth->verifyIdToken(
+                $request->token,
+                false,
+                300
+            );
+
             $uid = $verifiedIdToken->claims()->get('sub');
             $firebaseUser = $this->firebaseAuth->getUser($uid);
 

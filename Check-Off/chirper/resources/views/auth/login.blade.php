@@ -110,7 +110,7 @@
     document.getElementById('google-login-btn').addEventListener('click', async () => {
         try {
             const result = await signInWithPopup(auth, provider);
-            const token = await result.user.getIdToken();
+            const token = await result.user.getIdToken(true);
             await sendTokenToLaravel(token);
         } catch (error) {
             console.error(error);
@@ -126,7 +126,7 @@
 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const token = await userCredential.user.getIdToken();
+            const token = await userCredential.user.getIdToken(true);
             await sendTokenToLaravel(token);
         } catch (error) {
             console.error(error);
