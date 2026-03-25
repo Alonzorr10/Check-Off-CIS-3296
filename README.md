@@ -1,7 +1,16 @@
 # Check-Off - Make Splitting Simple
 
+## Team Members
+
+Alonzo Rico, Lihang Jin, Nona Oi
+
 ## Overview
 Check off is a Laravel Web application that allows users to either create events and assign users with a contribution owed or mark off contributions owed as a guest. Simply utilizing Firebase's easy to implement database features, we simply cross reference and check for the user's details, match their name to an existing event, and outline all of their existing contributions.
+
+## Tech Stack
+
+- Laravel
+- Firebase
 
 ## Prerequisites
 In order to run our application, you need a few things
@@ -51,15 +60,17 @@ For PHP, follow the same instructions like with git
 
 ## What next?
 
-After all the dependencies are installed, create a new folder where you will clone our Repository.
+After all the dependencies are installed, create a new folder in your desktop where you will clone our Repository.
 
-Open your given Compiler and open the folder you created
+Open a code editor (like Visual Studio Code) and open the folder you created. It should be in your Desktop.
 
 Then, navigate back to this repo, click on "Code" and copy the link.
 
 Go back to your editor, open your terminal, and run the following command
 
 ``git clone <repo-link>``
+
+Now, you can open the folder named "Check-Off-CIS-3296" to see all the project files.
 
 Afterwards, all the assets from the project should be installed. Now is best to run the following commands to actually install these dependencies:
 
@@ -84,8 +95,26 @@ Finally, run the following command to actually start the server and start using 
 ```npm run dev```
 
 
-NOTE: In any case the Herd server isn't working, open another terminal (while npm run dev is running) and run the following command
+NOTE: In any case the Herd server isn't working, open another terminal within your editor. To do this, navigate to the "Terminal" section and click "New Terminal". while npm run dev is running, run the following command
 
 ```php artisan serve```
 
 This will start a php development server and will also allow you to access the application. Just click on the link generated after running
+
+
+## File Structure Overview (Files that were directly used)
+
+- Resources: Folder that contains the main CSS, JS, and Pages involved in the project
+- Views: Folder within Resources that holds all the pages in our application
+- Auth: Folder within views that holds all the login, register, and other authentication related pages in our application
+- Components/Layouts: Folder that contains persistent assets that are similar in every page. Will pull from another folder called "partials"
+- Components/Layouts/Partials: Where components like "nav-bar" and "altnav-bar" reside
+- Routes: Folder containing all the route connections to each page and controls access to those pages
+- Storage/Firebase: Folder that contains the JSON which contains the provate key that allows access to the database
+- .env: File that contains all sensative information like DB passwords, App ID, etc
+- artisan: File that's interacted by php in order to write to certain folders it's given access to
+- vite.config.js: config file that tells Vite what files to load on reload
+
+## Attribution
+
+- No external Libraries used
