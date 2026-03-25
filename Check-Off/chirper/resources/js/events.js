@@ -47,15 +47,15 @@ window.addNewEventBlock = function () {
 
     const html = `
         <div class="bg-stone-900 border-2 border-emerald-500 rounded-2xl p-6 mb-4 shadow-2xl" id="temp-${tempId}">
-            <input type="text" id="input-name-${tempId}" 
-                   class="w-full p-3 bg-stone-950 border-stone-700 rounded-xl text-white mb-4 outline-none focus:border-emerald-500" 
+            <input type="text" id="input-name-${tempId}"
+                   class="w-full p-3 bg-stone-950 border-stone-700 rounded-xl text-white mb-4 outline-none focus:border-emerald-500"
                    placeholder="Enter Event Name (e.g. Birthday Dinner)">
             <div class="flex gap-3">
-                <button type="button" onclick="confirmNewEvent('${tempId}', '${randomCode}')" 
+                <button type="button" onclick="confirmNewEvent('${tempId}', '${randomCode}')"
                         class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-sm font-bold transition">
                     Save Event
                 </button>
-                <button type="button" onclick="document.getElementById('temp-${tempId}').remove()" 
+                <button type="button" onclick="document.getElementById('temp-${tempId}').remove()"
                         class="text-stone-400 text-sm hover:text-white transition">
                     Cancel
                 </button>
@@ -179,7 +179,7 @@ function renderUI(snapshot) {
                             <div class="text-[11px] text-stone-500">${item.debtor_name}</div>
                         </div>
                         <div class="text-right">
-                            <div class="text-[13px] font-medium ${isSettled ? "text-stone-500" : "text-emerald-400"}">
+                            <div class="text-white text-[13px] font-medium ${isSettled ? "text-stone-500" : "text-emerald-400"}">
                                 ¥${amount.toLocaleString()}
                             </div>
                             <span class="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-tighter
@@ -187,7 +187,7 @@ function renderUI(snapshot) {
                                     isSettled
                                         ? "bg-emerald-900/30 text-emerald-500"
                                         : isVerifying
-                                          ? "bg-amber-500 text-black font-bold animate-pulse"
+                                          ? "bg-amber-500 text-white font-bold animate-pulse"
                                           : "bg-stone-800 text-stone-500"
                                 }">
                                 ${item.status.replace("_", " ")}
@@ -197,7 +197,7 @@ function renderUI(snapshot) {
                     ${
                         isVerifying
                             ? `
-                        <div class="mt-3 bg-stone-950 p-3 rounded-lg border border-amber-900/50">
+                        <div class="mt-3 text-white">
                             <div class="text-[10px] text-amber-200 mb-2 italic">Note: "${item.payment_note || "No note"}"</div>
                             <div class="flex gap-2">
                                 <button onclick="verifyPayment('${cDoc.id}', 'settled')" class="flex-1 bg-emerald-600 text-white text-[10px] py-1.5 rounded-md font-bold">Confirm</button>

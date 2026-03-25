@@ -1,8 +1,8 @@
 @extends('layouts.web')
 
 @section('content')
-    
-    <div class='flex flex-1 flex-col justify-center items-center'>
+<div class='flex-1 flex flex-col justify-center items-center'>
+    <div class='flex flex-col justify-center items-center basis-1/3'>
         <h1 class='text-7xl font-bold text-stone-700'>Check-Off</h1>
         <p class='text-stone-800'>Pay just the right amount.</p>
     </div>
@@ -20,4 +20,5 @@
             <p class='text-white'>Compete streak scores with your friends to get exclusive rewards!</p>
         </div>
     </div>
+</div>
 @endsection
