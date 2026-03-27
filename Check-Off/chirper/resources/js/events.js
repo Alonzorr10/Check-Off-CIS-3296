@@ -161,7 +161,15 @@ function renderUI(snapshot) {
                 <button onclick="toggleForm('${eventId}')" class="w-full py-2 border border-dashed border-stone-700 rounded-xl text-xs text-stone-500 hover:bg-stone-800 transition">
                     + Add Contribution
                 </button>
-            </div>`;
+                <button type="button" onclick="toggleForm('${eventId}')" 
+                        class="text-stone-400 text-xs hover:text-white transition">Cancel</button>
+            </div>
+        </div>
+
+        <button onclick="toggleForm('${eventId}')" class="w-full py-2 border border-dashed border-stone-700 rounded-xl text-xs text-stone-500 hover:bg-stone-800 transition">
+            + Add Sub-Category
+        </button>
+    </div>`;
 
         container.insertAdjacentHTML("beforeend", eventHtml);
 
@@ -247,18 +255,32 @@ function renderUI(snapshot) {
     });
 }
 
+window.toggleEmailField = (eventId, show) => {
+    const container = document.getElementById(`email-container-${eventId}`);
+    const emailInput = document.getElementById(`email-${eventId}`);
+    if (show) {
+        container.classList.remove("hidden");
+        emailInput.focus();
+    } else {
+        container.classList.add("hidden");
+        emailInput.value = "";
+    }
+};
+
 window.saveContribution = async function (eventId, eventCode) {
     const labelInput = document.getElementById(`label-${eventId}`);
     const debtorInput = document.getElementById(`owner-${eventId}`);
     const debtorEmailInput = document.getElementById(`owner-email-${eventId}`);
     const amountInput = document.getElementById(`amount-${eventId}`);
     const dueAtInput = document.getElementById(`due-at-${eventId}`);
+    const emailInput = document.getElementById(`email-${eventId}`);
 
     const label = labelInput.value.trim();
     const debtor = debtorInput.value.trim();
     const debtorEmail = normalizeSettlementUserKey(debtorEmailInput.value);
     const amount = amountInput.value.trim();
     const dueAtValue = dueAtInput.value;
+    const email = emailInput.value.trim();
 
     if (!label || !debtor || !debtorEmail || !amount || !dueAtValue) {
         return alert("Please fill out label, debtor name, debtor email, amount, and due date.");
