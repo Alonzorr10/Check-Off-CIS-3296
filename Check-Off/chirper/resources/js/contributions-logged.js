@@ -1,5 +1,4 @@
 import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import {
     getFirestore,
     collection,
@@ -10,6 +9,12 @@ import {
     updateDoc,
     serverTimestamp,
 } from "firebase/firestore";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import {
+    getSettlementStreak,
+    normalizeSettlementUserKey,
+    resetStreakIfUserHasOverdueDebt,
+} from "./settlement-streak";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
@@ -24,85 +29,163 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-let userEmail = null;
+let unsubscribe = null;
 
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        userEmail = user.email;
-        console.log("Logged in with", userEmail);
-        startMemberListener(userEmail);
-    } else {
-        window.location.href = "/login";
-    }
-});
-
-function startMemberListener(email) {
-    const container = document.getElementById("user-contribution-container");
-
-    const q = query(
-        collection(db, "contributions"),
-        where("email", "==", email),
-        where("status", "!=", "settled"),
-    );
-
-    onSnapshot(q, (snapshot) => {
-        console.log("Snapshot received, document count: ", snapshot.size);
-        if (snapshot.empty) {
-            container.innerHTML = `<div class="text-stone-500 text-center py-20 italic">You're all caught up! No active debts found for ${email}.</div>`;
-            return;
-        }
-        let html = `<h1 class="text-xl font-black text-white mb-6 uppercase italic tracking-tighter">My Active Debts</h1>`;
-        let total = 0;
-
-        snapshot.forEach((snap) => {
-            const data = snap.data();
-            const amount = parseFloat(data.amount) || 0;
-            total += amount;
-
-            html += `
-                <div class="bg-stone-900 border border-stone-800 p-5 rounded-3xl mb-4 shadow-2xl">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <span class="text-[10px] text-emerald-500 font-mono font-bold uppercase">Event: ${data.event_code}</span>
-                            <h3 class="text-white font-bold text-lg">${data.label}</h3>
-                        </div>
-                        <div class="text-emerald-400 font-black text-xl">¥${amount.toLocaleString()}</div>
-                    </div>
-                    
-                    <div class="flex items-center justify-between mt-4 pt-4 border-t border-stone-800/50">
-                        <span class="text-[10px] uppercase text-stone-500 font-bold">${data.status.replace("_", " ")}</span>
-                        ${
-                            data.status === "pending"
-                                ? `
-                            <button onclick="requestPaymentVerify('${snap.id}')" class="bg-emerald-600 text-white px-4 py-1.5 rounded-xl text-[11px] font-bold shadow-lg active:scale-95 transition">
-                                Mark as Paid
-                            </button>
-                        `
-                                : `<span class="text-[10px] text-amber-500 italic">Waiting for verification...</span>`
-                        }
-                    </div>
-                </div>
-            `;
-        });
-        html += `
-            <div class="mt-10 p-6 bg-emerald-600 rounded-3xl flex justify-between items-center shadow-emerald-900/20 shadow-2xl">
-                <span class="text-emerald-100 text-xs font-bold uppercase tracking-widest">Grand Total Owed</span>
-                <span class="text-white text-3xl font-black italic">¥${total.toLocaleString()}</span>
-            </div>
-        `;
-        container.innerHTML = html;
-    });
+function formatDate(timestamp) {
+    if (!timestamp?.toDate) return "No due date";
+    return timestamp.toDate().toLocaleString();
 }
 
-window.requestPaymentVerify = async (id) => {
-    const note = prompt("How did you settle payment?");
-    if (!note) {
+function isOverdue(data) {
+    const dueAt = data.due_at?.toDate ? data.due_at.toDate() : null;
+    if (!dueAt) return false;
+
+    const status = data.status || "pending";
+    return (
+        dueAt < new Date() &&
+        ["pending", "pending_verification"].includes(status)
+    );
+}
+
+async function renderStreak(email) {
+    const streak = await getSettlementStreak(db, email);
+
+    document.getElementById("streak-current").innerText = String(
+        streak.current_streak || 0,
+    );
+    document.getElementById("streak-best").innerText = String(
+        streak.best_streak || 0,
+    );
+    document.getElementById("streak-last-result").innerText =
+        streak.last_result || "none";
+}
+
+function renderContributions(snapshot) {
+    const container = document.getElementById("contributions-container");
+
+    if (snapshot.empty) {
+        container.innerHTML = `
+            <div class="rounded-2xl border border-stone-700 bg-stone-900 p-6 text-center text-stone-400">
+                You currently have no contributions assigned to your account.
+            </div>
+        `;
         return;
     }
 
-    await updateDoc(doc(db, "contributions", id), {
-        status: "pending_verification",
-        payment_note: note,
-        paid_at: serverTimestamp(),
+    let html = "";
+    let total = 0;
+
+    snapshot.forEach((itemDoc) => {
+        const data = itemDoc.data();
+        const amount = parseFloat(data.amount) || 0;
+        total += amount;
+
+        const status = data.status || "pending";
+        const overdue = isOverdue(data);
+
+        html += `
+            <div class="bg-stone-900 p-5 rounded-2xl mb-4 border border-stone-800 shadow-lg">
+                <div class="flex justify-between items-start gap-4">
+                    <div>
+                        <div class="text-white font-bold text-lg">${data.label}</div>
+                        <div class="text-stone-400 text-sm mt-1">Event code: ${data.event_code || "-"}</div>
+                        <div class="text-stone-500 text-sm">Due: ${formatDate(data.due_at)}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-emerald-400 font-mono text-xl">¥${amount.toLocaleString()}</div>
+                        <div class="mt-2 text-[10px] uppercase tracking-widest ${
+                            status === "settled"
+                                ? "text-emerald-400"
+                                : status === "pending_verification"
+                                  ? "text-amber-300"
+                                  : status === "denied"
+                                    ? "text-red-400"
+                                    : overdue
+                                      ? "text-red-500"
+                                      : "text-stone-500"
+                        }">
+                            ${overdue ? "overdue" : status.replace("_", " ")}
+                        </div>
+                    </div>
+                </div>
+
+                ${
+                    data.payment_note
+                        ? `
+                    <div class="mt-3 p-3 bg-stone-950 rounded-lg border border-stone-800 text-[12px] text-stone-400">
+                        Payment note: ${data.payment_note}
+                    </div>
+                `
+                        : ""
+                }
+
+                ${
+                    ["pending", "denied"].includes(status)
+                        ? `
+                    <button onclick="markAsPaid('${itemDoc.id}')" 
+                            class="mt-4 w-full py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-bold rounded-lg transition">
+                        Submit Payment
+                    </button>
+                `
+                        : ""
+                }
+            </div>
+        `;
     });
+
+    html += `
+        <div class="mt-6 pt-4 border-t border-stone-700 flex justify-between items-center">
+            <div class="text-stone-400 text-sm uppercase tracking-tighter">Total Outstanding</div>
+            <div class="text-white text-2xl font-bold">¥${total.toLocaleString()}</div>
+        </div>
+    `;
+
+    container.innerHTML = html;
+}
+
+function listenToContributions(email) {
+    if (unsubscribe) unsubscribe();
+
+    const q = query(
+        collection(db, "contributions"),
+        where("debtor_email", "==", normalizeSettlementUserKey(email)),
+    );
+
+    unsubscribe = onSnapshot(q, async (snapshot) => {
+        renderContributions(snapshot);
+        await renderStreak(email);
+    });
+}
+
+window.markAsPaid = async function (docId) {
+    const note = prompt("Describe how you paid this debt.");
+    if (note === null) return;
+
+    if (!note.trim()) {
+        alert("Payment note is required.");
+        return;
+    }
+
+    try {
+        const docRef = doc(db, "contributions", docId);
+        await updateDoc(docRef, {
+            status: "pending_verification",
+            payment_note: note.trim(),
+            paid_at: serverTimestamp(),
+        });
+    } catch (error) {
+        console.error("Error updating contribution:", error);
+        alert("Something went wrong while submitting payment.");
+    }
 };
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user || !user.email) {
+        window.location.href = "/login";
+        return;
+    }
+
+    await resetStreakIfUserHasOverdueDebt(db, user.email);
+    await renderStreak(user.email);
+    listenToContributions(user.email);
+});

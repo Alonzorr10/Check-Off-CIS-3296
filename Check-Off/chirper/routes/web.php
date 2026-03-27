@@ -18,7 +18,7 @@ Route::get('/contributions-logged-in', function () {
 
 Route::get('/contributions', function () {
     return view('contributions');
-})->middleware(['auth'])->name('contributions');
+})->name('contributions');
 
 Route::get('/events', function () {
     return view('events');

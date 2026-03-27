@@ -9,12 +9,6 @@ import {
     updateDoc,
     serverTimestamp,
 } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import {
-    getSettlementStreak,
-    normalizeSettlementUserKey,
-    resetStreakIfUserHasOverdueDebt,
-} from "./settlement-streak";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "",
@@ -27,102 +21,133 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app);
+
+const inputs = document.querySelectorAll('input[maxlength="1"]');
+const nameInput = document.getElementById("name");
+const searchBtn = document.getElementById("view-contributions");
+
+// 1. INPUT BEHAVIOR (Auto-focus next box)
+inputs.forEach((input, index) => {
+    input.addEventListener("input", (e) => {
+        if (e.target.value.length === 1 && index < inputs.length - 1) {
+            inputs[index + 1].focus();
+        }
+    });
+    input.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !e.target.value && index > 0) {
+            inputs[index - 1].focus();
+        }
+    });
+});
+
+// 2. SEARCH LOGIC
+searchBtn.addEventListener("click", () => {
+    const code = Array.from(inputs)
+        .map((i) => i.value)
+        .join("")
+        .toUpperCase();
+    const name = nameInput.value.trim();
+
+    if (code.length === 6 && name.length > 0) {
+        searchBtn.innerText = "Searching...";
+        searchBtn.disabled = true;
+
+        fetchContributions(code, name);
+
+        setTimeout(() => {
+            searchBtn.innerText = "View Contributions Owed";
+            searchBtn.disabled = false;
+        }, 1000);
+    } else {
+        alert("Please enter the full 6-digit code and your name.");
+    }
+});
 
 let unsubscribe = null;
 
-function formatDate(timestamp) {
-    if (!timestamp?.toDate) return "No due date";
-    return timestamp.toDate().toLocaleString();
-}
+function fetchContributions(code, name) {
+    if (unsubscribe) unsubscribe();
 
-function isOverdue(data) {
-    const dueAt = data.due_at?.toDate ? data.due_at.toDate() : null;
-    if (!dueAt) return false;
-
-    const status = data.status || "pending";
-    return dueAt < new Date() && ["pending", "pending_verification"].includes(status);
-}
-
-async function renderStreak(email) {
-    const streak = await getSettlementStreak(db, email);
-
-    document.getElementById("streak-current").innerText = String(
-        streak.current_streak || 0
+    // UPDATED QUERY:
+    // We search by event_code and name.
+    // We don't filter by 'email' here because guests don't have linked emails.
+    const q = query(
+        collection(db, "contributions"),
+        where("event_code", "==", code),
+        where("debtor_name", "==", name),
     );
-    document.getElementById("streak-best").innerText = String(
-        streak.best_streak || 0
+
+    unsubscribe = onSnapshot(
+        q,
+        (snapshot) => {
+            renderContributions(snapshot);
+        },
+        (error) => {
+            console.error("Search error:", error);
+        },
     );
-    document.getElementById("streak-last-result").innerText =
-        streak.last_result || "none";
 }
 
+// 3. UI RENDERING
 function renderContributions(snapshot) {
     const container = document.getElementById("contributions-container");
 
     if (snapshot.empty) {
         container.innerHTML = `
-            <div class="rounded-2xl border border-stone-700 bg-stone-900 p-6 text-center text-stone-400">
-                You currently have no contributions assigned to your account.
-            </div>
-        `;
+            <div class="text-stone-500 text-sm mt-8 text-center italic border-2 border-dashed border-stone-800 p-6 rounded-2xl">
+                No items found for this name in Event ${Array.from(inputs)
+                    .map((i) => i.value)
+                    .join("")}. 
+                <br><span class="text-[10px]">Try checking for typos or ask the owner if you are a "Guest" or "User".</span>
+            </div>`;
         return;
     }
 
-    let html = "";
+    let html = `<h2 class="text-xs font-bold text-stone-500 uppercase tracking-widest mb-4">Results found:</h2>`;
     let total = 0;
 
-    snapshot.forEach((itemDoc) => {
-        const data = itemDoc.data();
+    snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
         const amount = parseFloat(data.amount) || 0;
         total += amount;
 
         const status = data.status || "pending";
-        const overdue = isOverdue(data);
+        const isPending = status === "pending";
+        const isVerifying = status === "pending_verification";
+        const isSettled = status === "settled";
 
         html += `
-            <div class="bg-stone-900 p-5 rounded-2xl mb-4 border border-stone-800 shadow-lg">
-                <div class="flex justify-between items-start gap-4">
+            <div class="bg-stone-900 p-5 rounded-2xl mb-3 border border-stone-800 shadow-xl">
+                <div class="flex justify-between items-center">
                     <div>
                         <div class="text-white font-bold text-lg">${data.label}</div>
-                        <div class="text-stone-400 text-sm mt-1">Event code: ${data.event_code || "-"}</div>
-                        <div class="text-stone-500 text-sm">Due: ${formatDate(data.due_at)}</div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-emerald-400 font-mono text-xl">¥${amount.toLocaleString()}</div>
-                        <div class="mt-2 text-[10px] uppercase tracking-widest ${
-                            status === "settled"
-                                ? "text-emerald-400"
-                                : status === "pending_verification"
-                                  ? "text-amber-300"
-                                  : status === "denied"
-                                    ? "text-red-400"
-                                    : overdue
-                                      ? "text-red-500"
-                                      : "text-stone-500"
-                        }">
-                            ${overdue ? "overdue" : status.replace("_", " ")}
+                        <div class="text-[10px] uppercase tracking-widest mt-1 font-bold
+                            ${isSettled ? "text-emerald-500" : isVerifying ? "text-amber-400 animate-pulse" : "text-stone-500"}">
+                            ${status.replace("_", " ")}
                         </div>
+                    </div>
+                    <div class="text-emerald-400 font-black text-xl">
+                        ¥${amount.toLocaleString()}
                     </div>
                 </div>
 
                 ${
-                    data.payment_note
+                    isPending
                         ? `
-                    <div class="mt-3 p-3 bg-stone-950 rounded-lg border border-stone-800 text-[12px] text-stone-400">
-                        Payment note: ${data.payment_note}
-                    </div>
+                    <button onclick="markAsPaid('${docSnap.id}')" 
+                            class="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-900/20">
+                        Mark as Paid
+                    </button>
                 `
                         : ""
                 }
 
                 ${
-                    ["pending", "denied"].includes(status)
+                    data.payment_note
                         ? `
-                    <button onclick="markAsPaid('${itemDoc.id}')" 
-                            class="mt-4 w-full py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-bold rounded-lg transition">
-                        Submit Payment
-                    </button>
+                    <div class="mt-3 p-3 bg-stone-950/50 rounded-lg border border-stone-800 text-[10px] text-stone-400 italic">
+                        Note: ${data.payment_note}
+                    </div>
                 `
                         : ""
                 }
@@ -131,58 +156,29 @@ function renderContributions(snapshot) {
     });
 
     html += `
-        <div class="mt-6 pt-4 border-t border-stone-700 flex justify-between items-center">
-            <div class="text-stone-400 text-sm uppercase tracking-tighter">Total Outstanding</div>
-            <div class="text-white text-2xl font-bold">¥${total.toLocaleString()}</div>
+        <div class="mt-8 p-5 bg-stone-900 border border-emerald-900/30 rounded-2xl flex justify-between items-center shadow-2xl">
+            <div class="text-stone-400 text-xs font-bold uppercase tracking-widest">Total Debt</div>
+            <div class="text-white text-3xl font-black italic underline decoration-emerald-500">¥${total.toLocaleString()}</div>
         </div>
     `;
-
     container.innerHTML = html;
 }
 
-function listenToContributions(email) {
-    if (unsubscribe) unsubscribe();
-
-    const q = query(
-        collection(db, "contributions"),
-        where("debtor_email", "==", normalizeSettlementUserKey(email)),
-    );
-
-    unsubscribe = onSnapshot(q, async (snapshot) => {
-        renderContributions(snapshot);
-        await renderStreak(email);
-    });
-}
-
+// 4. ACTION FUNCTIONS
 window.markAsPaid = async function (docId) {
-    const note = prompt("Describe how you paid this debt.");
-    if (note === null) return;
-
-    if (!note.trim()) {
-        alert("Payment note is required.");
-        return;
-    }
+    const note = prompt("How did you pay? (e.g., PayPay, LinePay, Cash)");
+    if (!note) return;
 
     try {
         const docRef = doc(db, "contributions", docId);
         await updateDoc(docRef, {
             status: "pending_verification",
-            payment_note: note.trim(),
+            payment_note: note,
             paid_at: serverTimestamp(),
         });
+        alert("Payment sent for verification!");
     } catch (error) {
-        console.error("Error updating contribution:", error);
-        alert("Something went wrong while submitting payment.");
+        console.error("Update error:", error);
+        alert("Could not update. Check your connection.");
     }
 };
-
-onAuthStateChanged(auth, async (user) => {
-    if (!user || !user.email) {
-        window.location.href = "/login";
-        return;
-    }
-
-    await resetStreakIfUserHasOverdueDebt(db, user.email);
-    await renderStreak(user.email);
-    listenToContributions(user.email);
-});
