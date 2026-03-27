@@ -4,14 +4,13 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-
 Route::get('/', function () {
-    if (Auth:: check()) {
+    if (Auth::check()) {
         $events = Auth::user()->events;
         return view('events', compact('events'));
     }
     return view('home');
-}); 
+});
 
 Route::get('/contributions-logged-in', function () {
     return view('contributions-logged-in');
@@ -19,7 +18,7 @@ Route::get('/contributions-logged-in', function () {
 
 Route::get('/contributions', function () {
     return view('contributions');
-});
+})->middleware(['auth'])->name('contributions');
 
 Route::get('/events', function () {
     return view('events');
