@@ -2,7 +2,6 @@
 
 @section('content')
 @vite(['resources/js/contributions.js'])
-
 <div class="max-w-5xl mx-auto py-10 px-4 space-y-8">
     <div class="bg-stone-900 border border-stone-800 rounded-2xl p-6">
         <h1 class="text-2xl font-bold text-white">My Settlement Streak</h1>

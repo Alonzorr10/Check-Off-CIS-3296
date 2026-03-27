@@ -38,12 +38,28 @@ let currentUserName = null;
 let currentUserEmail = null;
 let contributionUnsubscribes = [];
 
+// --- UI Helpers ---
+
 window.toggleForm = (id) => {
     const form = document.getElementById(`form-${id}`);
     if (form) {
         form.classList.toggle("hidden");
     }
 };
+
+window.toggleEmailField = (eventId, show) => {
+    const container = document.getElementById(`email-container-${eventId}`);
+    const emailInput = document.getElementById(`owner-email-${eventId}`);
+    if (show) {
+        container.classList.remove("hidden");
+        emailInput.focus();
+    } else {
+        container.classList.add("hidden");
+        emailInput.value = "";
+    }
+};
+
+// --- Event Management ---
 
 window.addNewEventBlock = function () {
     const container = document.getElementById("event-container");
@@ -70,11 +86,30 @@ window.addNewEventBlock = function () {
         </div>`;
 
     container.insertAdjacentHTML("afterbegin", html);
-
     setTimeout(
         () => document.getElementById(`input-name-${tempId}`).focus(),
         10,
     );
+};
+
+window.confirmNewEvent = async function (tempId, code) {
+    const nameInput = document.getElementById(`input-name-${tempId}`);
+    if (!nameInput || !nameInput.value.trim())
+        return alert("Enter an event name.");
+
+    try {
+        await addDoc(collection(db, "events"), {
+            name: nameInput.value.trim(),
+            code: code,
+            creator_id: currentUserId,
+            creator_name: currentUserName,
+            creator_email: currentUserEmail,
+            created_at: serverTimestamp(),
+        });
+        document.getElementById(`temp-${tempId}`).remove();
+    } catch (error) {
+        console.error("Error saving event:", error);
+    }
 };
 
 window.deleteEvent = async (id) => {
@@ -87,15 +122,14 @@ window.deleteEvent = async (id) => {
     }
 };
 
+// --- Auth & Listeners ---
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         currentUserId = user.uid;
         currentUserEmail = user.email;
         currentUserName = user.displayName || "Anonymous";
-
-        if (window.eventListenerUnsubscribe) {
-            window.eventListenerUnsubscribe();
-        }
+        if (window.eventListenerUnsubscribe) window.eventListenerUnsubscribe();
         listenToEvents();
     } else {
         window.location.href = "/login";
@@ -107,7 +141,6 @@ function listenToEvents() {
         collection(db, "events"),
         where("creator_id", "==", currentUserId),
     );
-
     window.eventListenerUnsubscribe = onSnapshot(q, (snapshot) => {
         contributionUnsubscribes.forEach((unsub) => unsub());
         contributionUnsubscribes = [];
@@ -119,6 +152,8 @@ function formatDate(timestamp) {
     if (!timestamp?.toDate) return "No due date";
     return timestamp.toDate().toLocaleString();
 }
+
+// --- Rendering ---
 
 function renderUI(snapshot) {
     const container = document.getElementById("event-container");
@@ -145,13 +180,31 @@ function renderUI(snapshot) {
                 </div>
 
                 <div id="form-${eventId}" class="hidden bg-stone-950 p-4 rounded-xl mb-4 border border-stone-800">
-                    <input type="text" id="label-${eventId}" placeholder="Item label" class="text-sm w-full p-2 mb-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
-                    <input type="text" id="owner-${eventId}" placeholder="Debtor name" class="text-sm w-full p-2 mb-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
-                    <input type="email" id="owner-email-${eventId}" placeholder="Debtor email" class="text-sm w-full p-2 mb-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
-                    <div class="flex gap-2 mb-2">
-                        <input type="number" id="amount-${eventId}" placeholder="Amount" class="text-sm w-full p-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
+                    <input type="text" id="label-${eventId}" placeholder="Item label" class="text-sm w-full p-2 mb-3 bg-stone-900 border-stone-700 rounded text-white outline-none">
+                    
+                    <div class="flex gap-4 mb-3 px-1">
+                        <label class="flex items-center gap-2 text-[10px] text-stone-400 cursor-pointer">
+                            <input type="radio" name="debtor-type-${eventId}" value="guest" checked onclick="toggleEmailField('${eventId}', false)" class="accent-emerald-500"> Guest
+                        </label>
+                        <label class="flex items-center gap-2 text-[10px] text-stone-400 cursor-pointer">
+                            <input type="radio" name="debtor-type-${eventId}" value="user" onclick="toggleEmailField('${eventId}', true)" class="accent-emerald-500"> Registered User
+                        </label>
+                    </div>
+
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="owner-${eventId}" placeholder="Debtor name" class="text-sm w-full p-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
+                        <input type="number" id="amount-${eventId}" placeholder="¥" class="text-sm w-24 p-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
+                    </div>
+
+                    <div id="email-container-${eventId}" class="hidden mb-3">
+                        <input type="email" id="owner-email-${eventId}" placeholder="Debtor email" class="text-sm w-full p-2 bg-stone-900 border-emerald-900/50 border rounded text-white outline-none">
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="text-[9px] text-stone-500 uppercase font-bold ml-1">Due Date</label>
                         <input type="datetime-local" id="due-at-${eventId}" class="text-sm w-full p-2 bg-stone-900 border-stone-700 rounded text-white outline-none">
                     </div>
+
                     <div class="flex gap-2">
                         <button type="button" onclick="saveContribution('${eventId}', '${event.code}')" class="bg-emerald-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Add Item</button>
                         <button type="button" onclick="toggleForm('${eventId}')" class="text-stone-400 text-xs">Cancel</button>
@@ -161,15 +214,7 @@ function renderUI(snapshot) {
                 <button onclick="toggleForm('${eventId}')" class="w-full py-2 border border-dashed border-stone-700 rounded-xl text-xs text-stone-500 hover:bg-stone-800 transition">
                     + Add Contribution
                 </button>
-                <button type="button" onclick="toggleForm('${eventId}')" 
-                        class="text-stone-400 text-xs hover:text-white transition">Cancel</button>
-            </div>
-        </div>
-
-        <button onclick="toggleForm('${eventId}')" class="w-full py-2 border border-dashed border-stone-700 rounded-xl text-xs text-stone-500 hover:bg-stone-800 transition">
-            + Add Sub-Category
-        </button>
-    </div>`;
+            </div>`;
 
         container.insertAdjacentHTML("beforeend", eventHtml);
 
@@ -177,7 +222,6 @@ function renderUI(snapshot) {
             collection(db, "contributions"),
             where("event_code", "==", event.code),
         );
-
         const unsub = onSnapshot(contQ, (contSnap) => {
             const listDiv = document.getElementById(listId);
             if (!listDiv) return;
@@ -193,55 +237,30 @@ function renderUI(snapshot) {
                 const status = item.status || "pending";
                 const isVerifying = status === "pending_verification";
                 const isSettled = status === "settled";
-                const isDenied = status === "denied";
 
                 itemsHtml += `
-                <div class="py-3 border-b border-stone-800 last:border-0">
-                    <div class="flex justify-between items-start gap-4">
-                        <div class="text-[13px] text-stone-300">
-                            <div class="font-bold text-white">${item.label}</div>
-                            <div class="text-[11px] text-stone-500">${item.debtor_name}</div>
-                            <div class="text-[11px] text-stone-500">${item.debtor_email || "No email set"}</div>
-                            <div class="text-[10px] text-stone-600 mt-1">Due: ${formatDate(item.due_at)}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-[13px] font-medium ${isSettled ? "text-stone-500" : "text-emerald-400"}">
-                                ¥${amount.toLocaleString()}
+                    <div class="py-3 border-b border-stone-800 last:border-0">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-bold text-white text-[13px]">${item.label}</div>
+                                <div class="text-[11px] text-stone-500">${item.debtor_name} (${item.email || "Guest"})</div>
+                                <div class="text-[10px] text-stone-600">Due: ${formatDate(item.due_at)}</div>
                             </div>
-                            <span class="text-[9px] px-2 py-0.5 rounded-full uppercase tracking-tighter
-                                ${
-                                    isSettled
-                                        ? "bg-emerald-900/30 text-emerald-500"
-                                        : isDenied
-                                          ? "bg-red-900/30 text-red-400"
-                                          : isVerifying
-                                            ? "bg-amber-500 text-black font-bold animate-pulse"
-                                            : "bg-stone-800 text-stone-500"
-                                }">
-                                ${status.replace("_", " ")}
-                            </span>
+                            <div class="text-right">
+                                <div class="text-[13px] font-medium ${isSettled ? "text-stone-500" : "text-emerald-400"}">¥${amount.toLocaleString()}</div>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full uppercase ${isVerifying ? "bg-amber-500 text-black animate-pulse" : "bg-stone-800 text-stone-500"}">${status.replace("_", " ")}</span>
+                            </div>
                         </div>
-                    </div>
-
-                    ${
-                        item.payment_note
-                            ? `<div class="mt-2 text-[10px] text-stone-400 italic">Payment note: ${item.payment_note}</div>`
-                            : ""
-                    }
-
-                    ${
-                        isVerifying
-                            ? `
-                        <div class="mt-3 bg-stone-950 p-3 rounded-lg border border-amber-900/50">
-                            <div class="text-[10px] text-amber-200 mb-2 italic">Review this submitted payment</div>
-                            <div class="flex gap-2">
+                        ${
+                            isVerifying
+                                ? `
+                            <div class="mt-3 flex gap-2">
                                 <button onclick="verifyPayment('${cDoc.id}', 'settled')" class="flex-1 bg-emerald-600 text-white text-[10px] py-1.5 rounded-md font-bold">Confirm</button>
                                 <button onclick="verifyPayment('${cDoc.id}', 'denied')" class="flex-1 bg-stone-800 text-stone-300 text-[10px] py-1.5 rounded-md">Deny</button>
-                            </div>
-                        </div>`
-                            : ""
-                    }
-                </div>`;
+                            </div>`
+                                : ""
+                        }
+                    </div>`;
             });
 
             listDiv.innerHTML =
@@ -250,164 +269,86 @@ function renderUI(snapshot) {
                     ? `<div class="text-right font-bold text-white mt-3 text-sm">Total: ¥${total.toLocaleString()}</div>`
                     : "");
         });
-
         contributionUnsubscribes.push(unsub);
     });
 }
 
-window.toggleEmailField = (eventId, show) => {
-    const container = document.getElementById(`email-container-${eventId}`);
-    const emailInput = document.getElementById(`email-${eventId}`);
-    if (show) {
-        container.classList.remove("hidden");
-        emailInput.focus();
-    } else {
-        container.classList.add("hidden");
-        emailInput.value = "";
-    }
-};
+// --- Core Actions ---
 
 window.saveContribution = async function (eventId, eventCode) {
-    const labelInput = document.getElementById(`label-${eventId}`);
-    const debtorInput = document.getElementById(`owner-${eventId}`);
-    const debtorEmailInput = document.getElementById(`owner-email-${eventId}`);
-    const amountInput = document.getElementById(`amount-${eventId}`);
-    const dueAtInput = document.getElementById(`due-at-${eventId}`);
-    const emailInput = document.getElementById(`email-${eventId}`);
+    const type = document.querySelector(
+        `input[name="debtor-type-${eventId}"]:checked`,
+    ).value;
+    const isUser = type === "user";
 
-    const label = labelInput.value.trim();
-    const debtor = debtorInput.value.trim();
-    const debtorEmail = normalizeSettlementUserKey(debtorEmailInput.value);
-    const amount = amountInput.value.trim();
-    const dueAtValue = dueAtInput.value;
-    const email = emailInput.value.trim();
+    const label = document.getElementById(`label-${eventId}`).value.trim();
+    const debtor = document.getElementById(`owner-${eventId}`).value.trim();
+    const email = document
+        .getElementById(`owner-email-${eventId}`)
+        .value.trim();
+    const amount = document.getElementById(`amount-${eventId}`).value.trim();
+    const dueAt = document.getElementById(`due-at-${eventId}`).value;
 
-    if (!label || !debtor || !debtorEmail || !amount || !dueAtValue) {
-        return alert("Please fill out label, debtor name, debtor email, amount, and due date.");
-    }
+    if (!label || !debtor || !amount || !dueAt)
+        return alert("Fill all required fields.");
+    if (isUser && !email) return alert("Registered users require an email.");
 
     try {
         await addDoc(collection(db, "contributions"), {
             event_code: eventCode,
             label,
             debtor_name: debtor,
-            debtor_email: debtorEmail,
+            email: isUser ? normalizeSettlementUserKey(email) : null, // Used for the search page
+            debtor_email: email ? normalizeSettlementUserKey(email) : null, // Used for streak logic
+            debtor_type: type,
             amount: parseFloat(amount),
-            due_at: Timestamp.fromDate(new Date(dueAtValue)),
+            due_at: Timestamp.fromDate(new Date(dueAt)),
             status: "pending",
-            payment_note: "",
             created_at: serverTimestamp(),
         });
-
-        labelInput.value = "";
-        debtorInput.value = "";
-        debtorEmailInput.value = "";
-        amountInput.value = "";
-        dueAtInput.value = "";
         window.toggleForm(eventId);
     } catch (error) {
-        console.error("Error adding contribution", error);
-        alert("Failed to add contribution.");
-    }
-};
-
-window.confirmNewEvent = async function (tempId, code) {
-    const nameInput = document.getElementById(`input-name-${tempId}`);
-    if (!nameInput) return;
-
-    const name = nameInput.value.trim();
-    if (!name) {
-        alert("Please enter a name for your event.");
-        return;
-    }
-
-    if (!currentUserId) {
-        alert("Authentication error. Please refresh and log in again.");
-        return;
-    }
-
-    try {
-        await addDoc(collection(db, "events"), {
-            name,
-            code,
-            creator_id: currentUserId,
-            creator_name: currentUserName,
-            creator_email: currentUserEmail,
-            created_at: serverTimestamp(),
-        });
-
-        const tempBlock = document.getElementById(`temp-${tempId}`);
-        if (tempBlock) tempBlock.remove();
-    } catch (error) {
-        console.error("Error saving event to Firestore:", error);
-        alert("Failed to save event.");
+        console.error("Error adding contribution:", error);
     }
 };
 
 window.verifyPayment = async function (docId, newStatus) {
-    const action = newStatus === "settled" ? "CONFIRM" : "DENY";
-    if (!confirm(`Are you sure you want to ${action} this payment?`)) return;
+    if (
+        !confirm(
+            `Are you sure you want to ${newStatus.toUpperCase()} this payment?`,
+        )
+    )
+        return;
 
     try {
         const docRef = doc(db, "contributions", docId);
-        const contributionSnap = await getDoc(docRef);
+        const snap = await getDoc(docRef);
+        if (!snap.exists()) return;
 
-        if (!contributionSnap.exists()) {
-            alert("Contribution not found.");
-            return;
-        }
-
-        const contribution = contributionSnap.data();
-        const debtorEmail = normalizeSettlementUserKey(contribution.debtor_email);
-        const dueAt = contribution.due_at?.toDate ? contribution.due_at.toDate() : null;
-        const paidAt = contribution.paid_at?.toDate ? contribution.paid_at.toDate() : null;
-
+        const data = snap.data();
         const updateData = {
             status: newStatus,
             reviewed_at: serverTimestamp(),
-            reviewed_by: currentUserEmail || null,
         };
 
-        if (newStatus === "denied") {
-            await resetSettlementStreak(db, {
-                userEmail: debtorEmail,
-                contributionId: docId,
-                eventCode: contribution.event_code || null,
-                reason: "denied",
-            });
-        }
-
         if (newStatus === "settled") {
-            updateData.settled_at = serverTimestamp();
-
-            const isOnTime = !!(dueAt && paidAt && paidAt <= dueAt);
-
-            if (isOnTime) {
+            const dueAt = data.due_at?.toDate();
+            const paidAt = data.paid_at?.toDate();
+            if (dueAt && paidAt && paidAt <= dueAt) {
                 await incrementSettlementStreak(db, {
-                    userEmail: debtorEmail,
+                    userEmail: data.debtor_email,
                     contributionId: docId,
-                    eventCode: contribution.event_code || null,
                 });
             } else {
                 await resetSettlementStreak(db, {
-                    userEmail: debtorEmail,
+                    userEmail: data.debtor_email,
                     contributionId: docId,
-                    eventCode: contribution.event_code || null,
-                    reason: "late_confirmed",
+                    reason: "late",
                 });
             }
         }
-
         await updateDoc(docRef, updateData);
-    } catch (error) {
-        console.error("Verification error:", error);
-        alert("Failed to update payment status.");
+    } catch (e) {
+        console.error(e);
     }
 };
-
-window.addNewEventBlock = addNewEventBlock;
-window.confirmNewEvent = confirmNewEvent;
-window.saveContribution = saveContribution;
-window.toggleForm = toggleForm;
-window.deleteEvent = deleteEvent;
-window.verifyPayment = verifyPayment;
