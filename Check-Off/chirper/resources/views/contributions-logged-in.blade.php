@@ -5,7 +5,7 @@
 <div class="max-w-2xl mx-auto py-8 px-4">
     <div id="user-contribution-container">
         <div class="text-stone-500 text-center animate-pulse py-20 text-sm italic">
-            Syncing your debts from the cloud...
+            Syncing your debts from Firebase...
         </div>
     </div>
 </div>
