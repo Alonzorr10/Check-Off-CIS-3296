@@ -62,13 +62,16 @@ For PHP, follow the same instructions like with git
 
 After all the dependencies are installed, create a new folder in your desktop where you will clone our Repository.
 
-Open a code editor (like Visual Studio Code) and open the folder you created. It should be in your Desktop.
+Open a code editor (like Visual Studio Code) and open the folder you created. It should be in your Desktop. 
+Navigate to File -> Open Folder -> Click on Desktop -> Select Folder
 
 Then, navigate back to this repo, click on "Code" and copy the link.
 
-Go back to your editor, open your terminal, and run the following command
+Go back to your code editor, navigate to "Terminal" at the top, and click "New Terminal". In that terminal, paste the following command
 
 ``git clone <repo-link>``
+
+MAKE SURE TO CHANGE <repo-link> to the link you copied from Github.
 
 Now, you can open the folder named "Check-Off-CIS-3296" to see all the project files.
 
@@ -82,13 +85,36 @@ Afterwards, all the assets from the project should be installed. Now is best to 
 
 Once all the dependencies have been downloaded, we'll now link our project to our herd so that it can create a .test link
 
-Run
+In order to do so, we should copy the contents of our.env.example file into our own .env file. To do so,
 
-```herd link```
+``cp .env.example .env``
 
-which will create a herd folder that you can select when you open up Herd.
+Once copied, we then must generate a key to secure the application during our session. Use this command
 
-Open up herd, select that folder, and .test server should be running.
+``php artisan key:generate``
+
+If this command doesn't run, refer back to the top and ensure PHP is downloaded.
+
+Then, we use this last command to actually link the project to .test domain
+
+``herd link [name of custom URL]``
+
+OPTIONAL: As we are using Firebase, in order to interact with the functions that interact with Firebase, we need to fill the .env file with details.
+
+Thus, make sure to
+- Create a Firebase Account
+- Create a New Firebase Project
+- Navigate to </> to register the project
+- Navigate to a firebaseConfig object which will contain important values like apiKey and authDomain
+- Copy those values to their respective fields in the .env (remember that you copied the .env.example file so the fields should be empty)
+- Then navigate to the Gear Icon (Project Settings) and click on Service Accounts
+- From here, you'll find a button to "Generate new private key"
+- This will download a .json file to your computer. You will then want to move this file in the path storage/app/firebase
+- Lastly, in that same .env file, find the "Firebase Credentials" field and fill with the path to the .json you moved
+
+After all this, make sure to run the following command so that this Firebase is now connected to your project:
+
+``php artisan migrate``
 
 Finally, run the following command to actually start the server and start using the application
 
