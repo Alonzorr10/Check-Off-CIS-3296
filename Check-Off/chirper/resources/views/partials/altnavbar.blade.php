@@ -11,7 +11,7 @@
                 @csrf
                 <button type="submit" class="nav-link bg-yellow-500 text-white font-bold px-6 py-3 rounded-2xl border-yellow-600 hover:bg-stone-800 transition-all">Logout</button>
             </form>
-            <a href='/profile' class='nav-link inline-flex items-center justify-center w-9 h-9 rounded-full hover:ring-1 hover:ring-stone-800 transition-all'>
+            <a href='/profile' class='nav-link inline-flex items-center justify-center w-9 h-9 rounded-full ring hover:ring-stone-800 transition-all'>
                 {{strtoupper(substr(Auth::user()->name,0,1))}}</a>
         @endauth
 

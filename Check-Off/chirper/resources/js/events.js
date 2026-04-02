@@ -247,8 +247,8 @@ function renderUI(snapshot) {
                                 <div class="text-[10px] text-stone-600">Due: ${formatDate(item.due_at)}</div>
                             </div>
                             <div class="text-right">
-                                <div class="text-[13px] font-medium ${isSettled ? "text-stone-500" : "text-emerald-400"}">¥${amount.toLocaleString()}</div>
-                                <span class="text-[9px] px-2 py-0.5 rounded-full uppercase ${isVerifying ? "bg-amber-500 text-black animate-pulse" : "bg-stone-800 text-stone-500"}">${status.replace("_", " ")}</span>
+                                <div class="text-[13px] text-white font-medium ${isSettled ? "text-white" : "text-emerald-400"}">¥${amount.toLocaleString()}</div>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full uppercase ${isVerifying ? "bg-amber-500 text-white animate-pulse" : "bg-stone-800 text-stone-500"}">${status.replace("_", " ")}</span>
                             </div>
                         </div>
                         ${

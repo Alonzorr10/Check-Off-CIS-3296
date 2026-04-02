@@ -1,23 +1,48 @@
 @extends('layouts.web')
 
 @section('content')
-<div class='flex-1 flex flex-col justify-center items-center'>
-    <div class='flex flex-col justify-center items-center basis-1/3'>
-        <h1 class='text-7xl font-bold text-stone-700'>Check-Off</h1>
-        <p class='text-stone-800'>Pay just the right amount.</p>
+<div class='flex-1 flex flex-col justify-center items-center text-stone-900 gap-5 text-xl'>
+    <div class='flex w-full py-16 flex-col justify-center items-center text-stone-100 bg-stone-700'>
+        <h1 class='text-7xl font-bold '>Check-Off</h1>
+        <p class=''>Pay just the right amount.</p>
     </div>
-    <div class='flex flex-1 flex-col justify-around items-center bg-stone-700 w-full'>
-        <div class='flex flex-1 justify-around items-center w-full'>
-            <h2 class='text-3xl font-bold text-white'>Event Organization</h2>
-            <p class='text-white'>Members can organize events and send links to participants!</p>
+    <div class='flex flex-1 w-full divide-x divide-stone-500'>
+        <div class='flex-1 flex flex-col items-center ml-5 gap-10 pr-5'>
+            <div class='text-2xl p-3'>Event participant features</div>
+            <div class='flex items-center justify-between gap-5'>
+                1. Enter code the organizer shared with you
+                <img src='{{ asset("code.png") }}' class='shadow w-1/3'></img>
+            </div>
+            <div class='flex items-center justify-between gap-5 '>
+                2. Once you are sure you have paid, let the organizer know
+                <img src='{{ asset("debt.png") }}' class='shadow w-2/3'></img>
+            </div>
+            <div class='flex items-center justify-between gap-5'>
+                3. <b>(user exclusive)</b> Build your streaks and compete with your friends!
+                <div class='flex flex-col w-3/5 gap-5'>
+                    <img src='{{ asset("streak.png") }}' class='shadow'></img>
+                    <a href="{{ route('register') }}" class='font-semibold mx-auto ring rounded p-3 text-center hover:ring-black hover:scale-95 transition-transform'>join us today!</a>
+                </div>
+            </div>
         </div>
-        <div class='flex flex-1 justify-around items-center w-full'>
-            <p class='text-white'>Enter the total amount for each category, and assign charges by expense category.</p>
-            <h2 class='text-3xl font-bold text-white'>Instant Bill-Split</h2>
-        </div>
-        <div class='flex flex-1 justify-around items-center w-full'>
-            <h2 class='text-3xl font-bold text-white'>Streak Rewards</h2>
-            <p class='text-white'>Compete streak scores with your friends to get exclusive rewards!</p>
+        <div class='flex-1 flex flex-col items-center mr-5 gap-10 pl-5'>
+            <div class='text-2xl inline-flex items-center gap-5 p-1'><b>(user exclusive) </b>Event organizer features <a href="{{ route('register') }}" class='text-base ring rounded p-3 hover:ring-black hover:scale-95 transition-transform font-semibold'>join us today!</a></div>
+            <div class='flex items-center justify-between'>
+                1. Create an event; code will be automatically generated for you
+                <img src='{{ asset("init.png") }}' class='shadow w-1/3'></img>
+            </div>
+            <div class='flex items-center justify-between gap-5'>
+                2. Assign each person charging amount for some purchase and set deadline
+                <img src='{{ asset("details.png") }}' class='shadow w-1/2'></img>
+            </div>
+            <div class='flex items-center justify-between gap-5'>
+                3. You can check assignees' payment status
+                <img src='{{ asset("waiting.png") }}' class='shadow w-1/2'></img>
+            </div>
+            <div class='flex items-center justify-between gap-5'>
+                2. Once you are sure you got paid, confirm it
+                <img src='{{ asset("confirm.png") }}' class='shadow w-1/2'></img>
+            </div>
         </div>
     </div>
 </div>

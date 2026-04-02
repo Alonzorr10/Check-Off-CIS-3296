@@ -3,7 +3,10 @@
 @section('content')
 @vite(['resources/js/contributions-logged.js'])
 
-    <div class="max-w-5xl mx-auto py-10 px-4 space-y-8">
+<div class="max-w-5xl mx-auto py-10 px-4 space-y-8 items-center justify-center flex flex-col">
+    @auth
+    <div class='flex items-center justify-center text-2xl'><a href="{{ route('profile.edit') }}" >Welcome back, {{Auth::user()->name}}!</a></div>@endauth
+    <div class='rounded-full ring w-20 h-20 flex items-center justify-center text-4xl'>{{strtoupper(substr(Auth::user()->name,0,1))}}</div>
     <div class="bg-stone-900 border border-stone-800 rounded-2xl p-6">
         <h1 class="text-2xl font-bold text-white">My Settlement Streak</h1>
         <p class="text-stone-400 mt-2">
@@ -27,4 +30,5 @@
             </div>
         </div>
     </div>
+</div>
 @endsection

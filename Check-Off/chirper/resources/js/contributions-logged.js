@@ -122,7 +122,7 @@ function renderContributions(snapshot) {
                 ${
                     ["pending", "denied"].includes(status)
                         ? `
-                    <button onclick="markAsPaid('${itemDoc.id}')" 
+                    <button onclick="markAsPaid('${itemDoc.id}')"
                             class="mt-4 w-full py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-sm font-bold rounded-lg transition">
                         Submit Payment
                     </button>

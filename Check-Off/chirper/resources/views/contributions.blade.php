@@ -18,12 +18,11 @@
   <div class='bg-emerald-600 text-white px-6 py-1 rounded-3xl font-bold shadow-lg hover:scale-95 transition-transform hover:outline-none hover:ring hover:ring-black hover:border-transparent'>
   <button id="view-contributions" type="button" class="">View Contributions Owed</button></div>
 </form>
-<div class='flex-1 flex flex-col items-center'>
-  <div class='h-1/6 flex items-center justify-center'>My Contributions</div>
-  <div class='flex-1 flex-wrap w-full'>
-    <div id="contributions-container">
+<div class='flex-1 flex flex-col items-start w-full'>
+  <div class='h-1/6 flex items-center justify-center w-full'>My Contributions</div>
+  <div class='flex-1 w-full'>
+    <div id="contributions-container" class='flex flex-col gap-4'>
     </div>
-      <div class='flex-1 flex flex-col items-start justify-center ring ring-stone-400'></div>
   </div>
 </div>
 

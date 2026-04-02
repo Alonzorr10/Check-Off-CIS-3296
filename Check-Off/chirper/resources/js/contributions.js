@@ -97,7 +97,7 @@ function renderContributions(snapshot) {
             <div class="text-stone-500 text-sm mt-8 text-center italic border-2 border-dashed border-stone-800 p-6 rounded-2xl">
                 No items found for this name in Event ${Array.from(inputs)
                     .map((i) => i.value)
-                    .join("")}. 
+                    .join("")}.
                 <br><span class="text-[10px]">Try checking for typos or ask the owner if you are a "Guest" or "User".</span>
             </div>`;
         return;
@@ -121,12 +121,12 @@ function renderContributions(snapshot) {
                 <div class="flex justify-between items-center">
                     <div>
                         <div class="text-white font-bold text-lg">${data.label}</div>
-                        <div class="text-[10px] uppercase tracking-widest mt-1 font-bold
+                        <div class=" text-white text-[10px] uppercase tracking-widest mt-1 font-bold
                             ${isSettled ? "text-emerald-500" : isVerifying ? "text-amber-400 animate-pulse" : "text-stone-500"}">
                             ${status.replace("_", " ")}
                         </div>
                     </div>
-                    <div class="text-emerald-400 font-black text-xl">
+                    <div class="text-emerald-500 text-xl">
                         ¥${amount.toLocaleString()}
                     </div>
                 </div>
@@ -134,7 +134,7 @@ function renderContributions(snapshot) {
                 ${
                     isPending
                         ? `
-                    <button onclick="markAsPaid('${docSnap.id}')" 
+                    <button onclick="markAsPaid('${docSnap.id}')"
                             class="mt-4 w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-xl transition-all active:scale-95 shadow-lg shadow-emerald-900/20">
                         Mark as Paid
                     </button>
@@ -156,9 +156,9 @@ function renderContributions(snapshot) {
     });
 
     html += `
-        <div class="mt-8 p-5 bg-stone-900 border border-emerald-900/30 rounded-2xl flex justify-between items-center shadow-2xl">
+        <div class="text-white mt-8 p-5 bg-stone-900 border border-emerald-900/30 rounded-2xl flex justify-between items-center shadow-2xl">
             <div class="text-stone-400 text-xs font-bold uppercase tracking-widest">Total Debt</div>
-            <div class="text-white text-3xl font-black italic underline decoration-emerald-500">¥${total.toLocaleString()}</div>
+            <div class="text-white text-3xl italic underline decoration-emerald-500">¥${total.toLocaleString()}</div>
         </div>
     `;
     container.innerHTML = html;
