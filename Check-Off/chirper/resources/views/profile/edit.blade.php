@@ -1,4 +1,4 @@
-@extends('layouts.logged')
+@extends('layouts.web')
 
 @section('content')
     <x-slot name="header">
