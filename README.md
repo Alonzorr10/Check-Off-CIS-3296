@@ -87,7 +87,7 @@ npm install firebase
 ```
 Once all the dependencies have been downloaded, we'll now link our project to our herd so that it can create a .test link
 
-In order to do so, we should copy the contents of our.env.example file into our own .env file. To do so,
+In order to do so, we should copy the contents of our env.example file into our own .env file. To do so,
 
 ```cp .env.example .env```
 
