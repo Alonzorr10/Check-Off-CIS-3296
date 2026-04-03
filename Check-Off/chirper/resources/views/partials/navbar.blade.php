@@ -1,4 +1,4 @@
-<nav class="nav bg-white border-b border-stone-200 px-6 py-4 flex items-center justify-between">
+<nav class="nav bg-blue-400 border-b border-stone-200 px-6 py-4 flex items-center justify-between">
     <div class="nav-links font-bold text-lg tracking-tight">
         <ul class="flex font-medium gap-4 items-center text-stone-600 text-lg">
         @auth
