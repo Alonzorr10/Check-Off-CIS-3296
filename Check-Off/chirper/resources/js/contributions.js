@@ -26,7 +26,6 @@ const inputs = document.querySelectorAll('input[maxlength="1"]');
 const nameInput = document.getElementById("name");
 const searchBtn = document.getElementById("view-contributions");
 
-// 1. INPUT BEHAVIOR (Auto-focus next box)
 inputs.forEach((input, index) => {
     input.addEventListener("input", (e) => {
         if (e.target.value.length === 1 && index < inputs.length - 1) {
@@ -40,7 +39,6 @@ inputs.forEach((input, index) => {
     });
 });
 
-// 2. SEARCH LOGIC
 searchBtn.addEventListener("click", () => {
     const code = Array.from(inputs)
         .map((i) => i.value)
@@ -68,9 +66,6 @@ let unsubscribe = null;
 function fetchContributions(code, name) {
     if (unsubscribe) unsubscribe();
 
-    // UPDATED QUERY:
-    // We search by event_code and name.
-    // We don't filter by 'email' here because guests don't have linked emails.
     const q = query(
         collection(db, "contributions"),
         where("event_code", "==", code),
@@ -88,7 +83,6 @@ function fetchContributions(code, name) {
     );
 }
 
-// 3. UI RENDERING
 function renderContributions(snapshot) {
     const container = document.getElementById("contributions-container");
 
@@ -164,7 +158,6 @@ function renderContributions(snapshot) {
     container.innerHTML = html;
 }
 
-// 4. ACTION FUNCTIONS
 window.markAsPaid = async function (docId) {
     const note = prompt("How did you pay? (e.g., PayPay, LinePay, Cash)");
     if (!note) return;

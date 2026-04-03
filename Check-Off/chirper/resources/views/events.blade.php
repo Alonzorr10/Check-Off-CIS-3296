@@ -1,9 +1,11 @@
-@extends('layouts.logged')
+@extends('layouts.web')
 
 @section('content')
 @vite(['resources/js/events.js'])
 </head>
 <body>
+    <div class="max-w-5xl mx-auto py-12 px-6">
+
     <div id="user-events">Your Events</div>
 
     <div id="new-event">
@@ -11,11 +13,7 @@
 
         <div id="event-container"class="space-y-4"></div>
     </div>
-
-
-
-
-    {{-- <script src="{{ asset('resources/js/events.js') }}"></script> --}}
+    </div>
 </body>
 </html>
 @endsection

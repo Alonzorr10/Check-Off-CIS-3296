@@ -1,4 +1,4 @@
-@extends('layouts.logged')
+@extends('layouts.web')
 
 @section('content')
 @vite(['resources/js/contributions-logged.js'])
