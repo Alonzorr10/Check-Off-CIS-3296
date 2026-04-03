@@ -9,8 +9,9 @@ Check off is a Laravel Web application that allows users to either create events
 
 ## Tech Stack
 
-- Laravel
-- Firebase
+- Laravel 11
+- Database/Auth: Firebase (Firestore & Firebase Auth)
+- Frontend: Tailwind CSS, Vite, JavaScript
 
 ## Prerequisites
 In order to run our application, you need a few things
@@ -69,7 +70,7 @@ Then, navigate back to this repo, click on "Code" and copy the link.
 
 Go back to your code editor, navigate to "Terminal" at the top, and click "New Terminal". In that terminal, paste the following command
 
-``git clone <repo-link>``
+```git clone <repo-link>```
 
 MAKE SURE TO CHANGE <repo-link> to the link you copied from Github.
 
@@ -77,27 +78,28 @@ Now, you can open the folder named "Check-Off-CIS-3296" to see all the project f
 
 Afterwards, all the assets from the project should be installed. Now is best to run the following commands to actually install these dependencies:
 
-``composer install``
+```
+composer install
 
-``npm install``
+npm install
 
-``npm install firebase``
-
+npm install firebase
+```
 Once all the dependencies have been downloaded, we'll now link our project to our herd so that it can create a .test link
 
 In order to do so, we should copy the contents of our.env.example file into our own .env file. To do so,
 
-``cp .env.example .env``
+```cp .env.example .env```
 
 Once copied, we then must generate a key to secure the application during our session. Use this command
 
-``php artisan key:generate``
+```php artisan key:generate```
 
 If this command doesn't run, refer back to the top and ensure PHP is downloaded.
 
 Then, we use this last command to actually link the project to .test domain
 
-``herd link [name of custom URL]``
+```herd link [name of custom URL]```
 
 OPTIONAL: As we are using Firebase, in order to interact with the functions that interact with Firebase, we need to fill the .env file with details.
 
@@ -112,21 +114,30 @@ Thus, make sure to
 - This will download a .json file to your computer. You will then want to move this file in the path storage/app/firebase
 - Lastly, in that same .env file, find the "Firebase Credentials" field and fill with the path to the .json you moved
 
+  For Reference, the credentials and keys will look like this:
+
+  ```
+  VITE_FIREBASE_API_KEY="your-api-key"
+  VITE_FIREBASE_AUTH_DOMAIN="your-project.firebaseapp.com"
+  VITE_FIREBASE_PROJECT_ID="your-project-id"
+  FIREBASE_CREDENTIALS="storage/app/firebase/your-file.json"
+  ```
+
 After all this, make sure to run the following command so that this Firebase is now connected to your project:
 
-``php artisan migrate``
+```php artisan migrate```
 
-Finally, run the following command to actually start the server and start using the application
+Finally, run the following command in the terminal opened to actually start the server and start using the application
 
 ```npm run dev```
-
 
 NOTE: In any case the Herd server isn't working, open another terminal within your editor. To do this, navigate to the "Terminal" section and click "New Terminal". while npm run dev is running, run the following command
 
 ```php artisan serve```
 
-This will start a php development server and will also allow you to access the application. Just click on the link generated after running
+NOTE: THESE TWO COMMANDS SHOULD BE RUNNING TOGETHER ON TWO TERMINALS IN VISUAL STUDIO CODE IF USING COMMAND ABOVE
 
+This will start a php development server and will also allow you to access the application. Just click on the link generated after running "npm run dev"
 
 ## File Structure Overview (Files that were directly used)
 
@@ -134,7 +145,7 @@ This will start a php development server and will also allow you to access the a
 - Views: Folder within Resources that holds all the pages in our application
 - Auth: Folder within views that holds all the login, register, and other authentication related pages in our application
 - Components/Layouts: Folder that contains persistent assets that are similar in every page. Will pull from another folder called "partials"
-- Components/Layouts/Partials: Where components like "nav-bar" and "altnav-bar" reside
+- Components/Layouts/Partials: Where components like "nav-bar"
 - Routes: Folder containing all the route connections to each page and controls access to those pages
 - Storage/Firebase: Folder that contains the JSON which contains the provate key that allows access to the database
 - .env: File that contains all sensative information like DB passwords, App ID, etc
