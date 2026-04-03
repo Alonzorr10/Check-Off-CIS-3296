@@ -1,10 +1,10 @@
 @extends('layouts.web')
 
 @section('content')
-<div class="flex-1 flex flex-col justify-center items-center bg-stone-100 px-4 min-h-full w-full py-12">
+<div class="flex-1 flex flex-col justify-center items-center  px-4 min-h-full w-full py-12">
 
     <div class="w-full sm:max-w-md px-6 py-8 bg-stone-900 shadow-2xl rounded-2xl border border-stone-800">
-        
+
         <h2 class="text-2xl font-bold text-white mb-6 text-center">Create Account</h2>
 
         <form id="firebase-register-form" class="space-y-4">

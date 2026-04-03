@@ -5,11 +5,11 @@
 </head>
 <body>
     <div class="max-w-5xl mx-auto py-12 px-6">
-    
+
     <div id="user-events">Your Events</div>
 
     <div id="new-event">
-        <button id="create-event" class="create-event" onclick="window.addNewEventBlock()"> Create New Event</button>
+        <div class='flex items-center justify-center mb-5'><button id="create-event" class="create-event" onclick="window.addNewEventBlock()"> Create New Event</button></div>
 
         <div id="event-container"class="space-y-4"></div>
     </div>

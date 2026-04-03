@@ -70,15 +70,15 @@ window.addNewEventBlock = function () {
 
     const html = `
         <div class="bg-stone-900 border-2 border-emerald-500 rounded-2xl p-6 mb-4 shadow-2xl" id="temp-${tempId}">
-            <input type="text" id="input-name-${tempId}" 
-                   class="w-full p-3 bg-stone-950 border-stone-700 rounded-xl text-white mb-4 outline-none focus:border-emerald-500" 
+            <input type="text" id="input-name-${tempId}"
+                   class="w-full p-3 bg-stone-950 border-stone-700 rounded-xl text-white mb-4 outline-none focus:border-emerald-500"
                    placeholder="Enter Event Name">
             <div class="flex gap-3">
-                <button type="button" onclick="confirmNewEvent('${tempId}', '${randomCode}')" 
+                <button type="button" onclick="confirmNewEvent('${tempId}', '${randomCode}')"
                         class="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-xl text-sm font-bold transition">
                     Save Event
                 </button>
-                <button type="button" onclick="document.getElementById('temp-${tempId}').remove()" 
+                <button type="button" onclick="document.getElementById('temp-${tempId}').remove()"
                         class="text-stone-400 text-sm hover:text-white transition">
                     Cancel
                 </button>
@@ -181,7 +181,7 @@ function renderUI(snapshot) {
 
                 <div id="form-${eventId}" class="hidden bg-stone-950 p-4 rounded-xl mb-4 border border-stone-800">
                     <input type="text" id="label-${eventId}" placeholder="Item label" class="text-sm w-full p-2 mb-3 bg-stone-900 border-stone-700 rounded text-white outline-none">
-                    
+
                     <div class="flex gap-4 mb-3 px-1">
                         <label class="flex items-center gap-2 text-[10px] text-stone-400 cursor-pointer">
                             <input type="radio" name="debtor-type-${eventId}" value="guest" checked onclick="toggleEmailField('${eventId}', false)" class="accent-emerald-500"> Guest
@@ -247,8 +247,8 @@ function renderUI(snapshot) {
                                 <div class="text-[10px] text-stone-600">Due: ${formatDate(item.due_at)}</div>
                             </div>
                             <div class="text-right">
-                                <div class="text-[13px] font-medium ${isSettled ? "text-stone-500" : "text-emerald-400"}">¥${amount.toLocaleString()}</div>
-                                <span class="text-[9px] px-2 py-0.5 rounded-full uppercase ${isVerifying ? "bg-amber-500 text-black animate-pulse" : "bg-stone-800 text-stone-500"}">${status.replace("_", " ")}</span>
+                                <div class="text-[13px] text-white font-medium ${isSettled ? "text-white" : "text-emerald-400"}">¥${amount.toLocaleString()}</div>
+                                <span class="text-[9px] px-2 py-0.5 rounded-full uppercase ${isVerifying ? "bg-amber-500 text-white animate-pulse" : "bg-stone-800 text-stone-500"}">${status.replace("_", " ")}</span>
                             </div>
                         </div>
                         ${
