@@ -11,7 +11,7 @@
         <link rel="icon" type="image/png" href="{{ asset('favicon.png') }}">
         <style>body {font-family: 'Chiron GoRound TC', sans-serif;}</style>
     </head>
-    <body class="flex flex-col w-full min-h-screen h-screen max-h-screen">
+    <body class="flex flex-col w-full min-h-screen">
         @include('partials.navbar')
         <div class='flex-1 flex'>
             @yield('content')

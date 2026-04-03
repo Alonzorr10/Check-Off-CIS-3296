@@ -1,12 +1,12 @@
 @extends('layouts.web')
 
 @section('content')
-<div class="flex-1 flex flex-col justify-center items-center bg-stone-100 px-4 min-h-full w-full">
-    
+<div class="flex-1 flex flex-col justify-center items-center px-4 min-h-full w-full">
+
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <div class="w-full sm:max-w-md px-6 py-8 bg-stone-900 shadow-2xl rounded-2xl border border-stone-800">
-        
+
         <form id="firebase-email-login-form" class="space-y-6">
             @csrf
 
@@ -50,9 +50,9 @@
 
         {{-- Google Login Section --}}
         <div class="mt-8 pt-6 border-t border-stone-800">
-            <x-primary-button 
-                id="google-login-btn" 
-                type="button" 
+            <x-primary-button
+                id="google-login-btn"
+                type="button"
                 class="w-full justify-center py-3 bg-stone-100 hover:bg-white text-stone-900 border-none"
             >
                 {{ __('SIGN IN WITH GOOGLE') }}

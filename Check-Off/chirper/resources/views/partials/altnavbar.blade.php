@@ -9,7 +9,7 @@
 
             <form method="POST" action="{{ route('logout') }}" style="display:inline">
                 @csrf
-                <button type="submit" class="nav-link bg-yellow-500 text-white font-bold px-6 py-3 rounded-2xl border-yellow-600 hover:bg-stone-800 transition-all">Logout</button>
+                <button type="submit" class="nav-link bg-yellow-500 text-white font-bold px-6 py-3 rounded-2xl border-yellow-600 hover:bg-stone-800 hover:scale-95 transition-all">Logout</button>
             </form>
             <a href='/profile' class='nav-link inline-flex items-center justify-center w-9 h-9 rounded-full ring hover:ring-stone-800 transition-all'>
                 {{strtoupper(substr(Auth::user()->name,0,1))}}</a>

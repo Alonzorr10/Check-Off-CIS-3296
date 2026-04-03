@@ -1,9 +1,79 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 body {
     font-family: "Chiron GoRound TC", sans-serif;
+    @apply bg-blue-200;
 }
+
+.bg-stone-900 {
+    color: white;
+}
+
+.bg-stone-950 {
+    color: white;
+}
+
+.card-label {
+    color: white !important;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.card-value {
+    color: white !important;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 0.5rem;
+}
+
+.event-code-display {
+    color: white !important;
+    font-size: 1.125rem;
+    font-family: monospace;
+    font-weight: 700;
+    letter-spacing: 0.125em;
+}
+
+.due-date-text {
+    color: rgb(229 231 235) !important;
+}
+
+.text-secondary-dark {
+    @apply text-stone-200;
+}
+
+.text-tertiary-dark {
+    @apply text-stone-300;
+}
+
+.text-muted {
+    @apply text-stone-400;
+}
+
+.status-badge {
+    @apply text-sm font-semibold px-3 py-1 rounded-full;
+}
+
+.card-label {
+    @apply text-xs font-bold uppercase tracking-widest text-stone-200;
+}
+
+.card-value {
+    @apply text-2xl font-bold text-white mt-2;
+}
+
+.event-code-display {
+    @apply text-lg font-mono font-bold tracking-wider text-white;
+}
+
+.due-date-text {
+    @apply text-sm text-stone-300;
+}
+
 /* events.blade.php */
 #user-events {
     font-size: 3rem;
@@ -17,13 +87,25 @@ button {
 }
 
 #create-event {
-    background-color: rgb(225, 178, 109);
+    background-color: white;
     font-family: inherit;
     font-size: 20px;
+    font-weight: 600;
+    transition: all 0.2s ease;
 }
 
 #create-event:hover {
-    background-color: rgb(230, 199, 168);
-    font-family: inherit;
-    font-size: 20px;
+    transform: scale(0.98);
+}
+
+#create-event:active {
+    transform: scale(0.95);
+}
+
+.dark-card-text {
+    @apply text-stone-100;
+}
+
+.dark-label {
+    @apply text-stone-200 text-xs font-bold uppercase tracking-widest;
 }

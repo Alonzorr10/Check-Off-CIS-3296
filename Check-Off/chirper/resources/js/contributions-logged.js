@@ -7,6 +7,7 @@ import {
     onSnapshot,
     doc,
     updateDoc,
+    getDocs,
     serverTimestamp,
 } from "firebase/firestore";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
@@ -59,7 +60,18 @@ async function renderStreak(email) {
     document.getElementById("streak-last-result").innerText =
         streak.last_result || "none";
 }
-
+async function render_stats(email){
+    if(!document.getElementById('total-owed'))return
+    const [owed_snap,events_snap]=await Promise.all([getDocs(query(collection(db,'contributions'),where('debtor_email','==',email),where('status','in',['pending','denied']))),getDocs(query(collection(db,'events'),where('host_email','==',email)))])
+    let total=0
+    owed_snap.forEach(d=>total+=parseFloat(d.data().amount)||0)
+    document.getElementById('total-owed').innerText=`¥${total.toLocaleString()}`
+    document.getElementById('event-count').innerText=events_snap.size
+    const codes=events_snap.docs.map(d=>d.data().code)
+    if(codes.length===0)return document.getElementById('pending-count').innerText='0'
+    const pending_snap=await getDocs(query(collection(db,'contributions'),where('event_code','in',codes),where('status','==','pending_verfication')))
+    document.getElementById('pending-count').innerText=pending_snap.size
+}
 function renderContributions(snapshot) {
     const container = document.getElementById("contributions-container");
 
@@ -187,5 +199,6 @@ onAuthStateChanged(auth, async (user) => {
 
     await resetStreakIfUserHasOverdueDebt(db, user.email);
     await renderStreak(user.email);
+    await render_stats(user.email)
     listenToContributions(user.email);
 });

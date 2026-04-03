@@ -21,12 +21,12 @@
                 3. <b>(user exclusive)</b> Build your streaks and compete with your friends!
                 <div class='flex flex-col w-3/5 gap-5'>
                     <img src='{{ asset("streak.png") }}' class='shadow'></img>
-                    <a href="{{ route('register') }}" class='font-semibold mx-auto ring rounded p-3 text-center hover:ring-black hover:scale-95 transition-transform'>join us today!</a>
+                    <a href="{{ route('register') }}" class='font-semibold mx-auto bg-stone-700 text-white text-lg rounded p-3 text-center hover:scale-95 transition-transform'>join us today!</a>
                 </div>
             </div>
         </div>
         <div class='flex-1 flex flex-col items-center mr-5 gap-10 pl-5'>
-            <div class='text-2xl inline-flex items-center gap-5 p-1'><b>(user exclusive) </b>Event organizer features <a href="{{ route('register') }}" class='text-base ring rounded p-3 hover:ring-black hover:scale-95 transition-transform font-semibold'>join us today!</a></div>
+            <div class='text-2xl inline-flex items-center gap-5 p-1'><b>(user exclusive) </b>Event organizer features <a href="{{ route('register') }}" class='text-lg rounded p-3 bg-stone-700 text-white  hover:scale-95 transition-transform font-semibold'>join us today!</a></div>
             <div class='flex items-center justify-between'>
                 1. Create an event; code will be automatically generated for you
                 <img src='{{ asset("init.png") }}' class='shadow w-1/3'></img>
