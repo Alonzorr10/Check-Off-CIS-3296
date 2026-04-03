@@ -10,7 +10,7 @@ Route::get('/', function () {
         return view('events', compact('events'));
     }
     return view('home');
-});
+})->name('home');
 
 Route::get('/contributions-logged-in', function () {
     return view('contributions-logged-in');

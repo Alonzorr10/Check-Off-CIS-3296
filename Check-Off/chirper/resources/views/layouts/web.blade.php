@@ -12,9 +12,11 @@
     </head>
     <body class="flex flex-col w-full min-h-screen h-screen max-h-screen">
         @include('partials.navbar')
+
         <div class='flex-1 flex'>
             @yield('content')
         </div>
+        
         <script>
         document.addEventListener('DOMContentLoaded',()=>{
             document.querySelectorAll('input[maxlength="1"]').forEach((input,idx,inputs)=>{

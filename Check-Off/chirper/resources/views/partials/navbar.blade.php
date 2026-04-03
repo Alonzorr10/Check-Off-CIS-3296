@@ -3,6 +3,7 @@
         <ul class="flex font-medium gap-4 items-center text-stone-600 text-lg">
         @auth
             {{-- Links for logged-in users --}}
+            <a href="/dashboard"class="nav-link rounded-2xl hover:ring-2 hover:ring-yellow-500 transition-all px-6 py-3">Dashboard</a>
             <a href="/events" class="rounded-2xl hover:ring-2 hover:ring-yellow-500 transition-all px-6 py-3 nav-link {{ request()->routeIs('home') ? 'active' : '' }}">Events</a>
             <a href="/contributions-logged-in" class="nav-link rounded-2xl hover:ring-2 hover:ring-yellow-500 transition-all px-6 py-3">Contributions</a>
 
